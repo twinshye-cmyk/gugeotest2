@@ -1,0 +1,906 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>주장하는 글 쓰기 수행평가</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F8F6; --surface:#FFFFFF; --ink:#1C2438; --muted:#5A6275; --rule:#D3D7DF;
+  --fill:#EEF1F5; --pen:#1F3F9E; --red:#C23A2E; --ok:#2F7D4F; --warn-bg:#FFF4D6;
+  --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Gowun Batang","AppleMyungjo","Batang",serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#14171F; --surface:#1C2029; --ink:#E7E9EE; --muted:#A1A8B7; --rule:#373D4A;
+    --fill:#242935; --pen:#9DB7FF; --red:#F07A6E; --ok:#6CC08F; --warn-bg:#3A3220;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#14171F; --surface:#1C2029; --ink:#E7E9EE; --muted:#A1A8B7; --rule:#373D4A;
+  --fill:#242935; --pen:#9DB7FF; --red:#F07A6E; --ok:#6CC08F; --warn-bg:#3A3220;
+}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 16px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.7;word-break:keep-all;overflow-wrap:anywhere;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--pen);outline-offset:2px}
+.wrap{max-width:780px;margin:0 auto;padding:0 20px}
+[hidden]{display:none!important}
+
+/* masthead */
+.mast{padding:36px 0 28px;border-bottom:2px solid var(--ink);position:relative}
+.mast-top{display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--muted);font-size:14px}
+.linkbtn{background:none;border:1px solid var(--rule);border-radius:6px;padding:6px 12px;cursor:pointer;color:var(--ink);font-size:14px}
+.linkbtn:hover{border-color:var(--ink)}
+.mast h1{font-family:var(--serif);font-weight:700;font-size:clamp(34px,7vw,52px);line-height:1.2;margin:18px 0 10px;letter-spacing:-0.01em}
+.mast-meta{color:var(--muted);font-size:15px;margin:0;max-width:30em}
+.seal{position:absolute;right:4px;bottom:22px;width:96px;height:96px;border:3px solid var(--red);border-radius:50%;
+  color:var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);
+  font-family:var(--serif);line-height:1.15;background:color-mix(in srgb,var(--surface) 70%,transparent)}
+.seal small{font-size:12px;font-family:var(--sans);font-weight:600}
+.seal b{font-size:22px;letter-spacing:.04em}
+@media (max-width:560px){.seal{position:static;margin-top:16px;transform:rotate(-4deg);width:84px;height:84px}}
+
+/* identity sentence */
+.idline{margin:28px 0 8px;padding:18px 20px;background:var(--surface);border:1px solid var(--rule);border-radius:10px;
+  font-size:18px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 4px}
+.idline .grp{display:inline-flex;align-items:center;white-space:nowrap}
+.idline input,.idline select{border:none;border-bottom:2px solid var(--rule);background:transparent;padding:2px 4px;text-align:center;color:var(--pen);font-weight:600;border-radius:0}
+.idline input:focus,.idline select:focus{border-bottom-color:var(--pen);outline:none}
+.idline select{width:4.2em;cursor:pointer}
+.idline .n2{width:3.2em}
+.idline .nm{width:7.5em}
+.idline .paren{color:var(--muted)}
+.hint{color:var(--muted);font-size:14px;margin:4px 0 0}
+
+/* question blocks */
+section.q{padding:40px 0 8px;border-bottom:1px solid var(--rule)}
+section.q:last-of-type{border-bottom:none}
+.qhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.qhead h2{font-family:var(--serif);font-size:26px;margin:0}
+.pts{font-size:14px;color:var(--muted);border:1px solid var(--rule);border-radius:999px;padding:2px 10px;white-space:nowrap}
+.qlead{margin:6px 0 18px;color:var(--muted)}
+.passage{background:var(--surface);border:1px solid var(--ink);padding:20px 22px;margin:0 0 22px;font-family:var(--serif);font-size:16.5px;line-height:1.9}
+.passage p{margin:0 0 .8em}
+.passage p:last-child{margin-bottom:0}
+.passage .tag{font-family:var(--sans);font-weight:700;margin-right:4px}
+.dlg{display:grid;grid-template-columns:max-content 1fr;gap:6px 12px}
+.dlg dt{font-family:var(--sans);font-weight:600;font-size:15px;padding-top:2px}
+.dlg dd{margin:0}
+.sub{margin:26px 0 30px}
+.sub label.prompt{display:block;font-weight:600;margin-bottom:10px}
+.sub label.prompt .no{color:var(--pen);margin-right:6px}
+.sub label.prompt .p{font-weight:400;color:var(--muted);font-size:14px;margin-left:4px}
+.cond{border:1px dashed var(--muted);border-radius:8px;padding:12px 16px;margin:0 0 12px;font-size:15px}
+.cond b{display:block;margin-bottom:4px}
+.cond ul{margin:0;padding-left:1.2em}
+.ans{width:100%;min-height:8em;resize:vertical;border:1px solid var(--rule);border-radius:8px;background-color:var(--surface);
+  color:var(--pen);font-family:var(--serif);font-size:17px;line-height:2.1em;padding:0.35em 14px;
+  background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(2.1em - 1px),var(--fill) calc(2.1em - 1px),var(--fill) 2.1em);
+  background-attachment:local;background-position:0 0.35em}
+.ans:focus{border-color:var(--pen);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--pen) 20%,transparent)}
+.ans.tall{min-height:14em}
+.meta-row{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:4px}
+.missing-flag .ans,.missing-flag input,.missing-flag select{border-color:var(--red)!important}
+.essay-part{margin:18px 0 22px}
+.essay-part label{display:block;font-family:var(--serif);font-weight:700;font-size:18px;margin-bottom:6px}
+
+/* bottom bar */
+.bar{position:sticky;bottom:0;z-index:5;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(6px);
+  border-top:1px solid var(--rule);margin-top:24px;padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px))}
+.bar .wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.prog{flex:1 1 240px;min-width:0}
+.prog strong{font-size:15px}
+.prog .track{height:6px;background:var(--fill);border-radius:3px;margin:6px 0 4px;overflow:hidden}
+.prog .fillbar{height:100%;background:var(--pen);width:0;transition:width .25s}
+.prog .left{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{border:1px solid var(--ink);background:var(--surface);color:var(--ink);border-radius:8px;padding:10px 18px;cursor:pointer;font-weight:600;white-space:nowrap}
+.btn:hover{background:var(--fill)}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.primary:hover{opacity:.9}
+.btn.danger{border-color:var(--red);color:var(--red)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.sm{padding:6px 12px;font-size:14px}
+.notice{background:var(--warn-bg);border-radius:8px;padding:12px 16px;margin:16px 0;font-size:15px}
+
+/* done */
+.done{padding:64px 0;text-align:left}
+.done h2{font-family:var(--serif);font-size:34px;margin:0 0 8px}
+.done .who{font-size:18px;margin:0 0 4px}
+.done .when{color:var(--muted);margin:0 0 24px}
+.done .row{display:flex;gap:10px;flex-wrap:wrap}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:20;background:rgba(10,12,18,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.dialog{background:var(--surface);color:var(--ink);border-radius:12px;max-width:460px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.dialog h3{margin:0 0 8px;font-family:var(--serif);font-size:22px}
+.dialog .row{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;flex-wrap:wrap}
+.dialog.wide{max-width:900px;max-height:calc(100% - 20px);display:flex;flex-direction:column;padding:0}
+.dialog.wide .dh{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--rule);flex-wrap:wrap}
+.dialog.wide .dh h3{margin:0;font-size:19px}
+.pages{overflow:auto;padding:18px;background:var(--fill);flex:1}
+.pages img{display:block;width:100%;max-width:760px;margin:0 auto 14px;box-shadow:0 2px 10px rgba(0,0,0,.15);background:#fff}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:var(--ink);color:var(--paper);
+  padding:10px 18px;border-radius:8px;font-size:15px;max-width:calc(100% - 32px);box-shadow:0 6px 24px rgba(0,0,0,.25)}
+
+/* admin */
+.admin-wrap{max-width:1100px;margin:0 auto;padding:0 20px 60px}
+.admin-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;padding:32px 0 18px;border-bottom:2px solid var(--ink)}
+.admin-top h1{font-family:var(--serif);font-size:34px;margin:0}
+.admin-top p{margin:2px 0 0;color:var(--muted)}
+.admin-top .row{display:flex;gap:8px;flex-wrap:wrap}
+.gate{max-width:380px;margin:60px auto;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:28px}
+.gate h2{font-family:var(--serif);margin:0 0 6px;font-size:24px}
+.gate p{color:var(--muted);margin:0 0 16px;font-size:15px}
+.field{display:block;margin:0 0 12px}
+.field span{display:block;font-size:14px;font-weight:600;margin-bottom:4px}
+.field input,.field select{width:100%;border:1px solid var(--rule);border-radius:8px;padding:10px 12px;background:var(--paper)}
+.gate .err{color:var(--red);font-size:14px;min-height:1.4em;margin:0 0 8px}
+.gate .alt{margin-top:14px;font-size:14px}
+.gate .alt button{background:none;border:none;color:var(--pen);cursor:pointer;padding:0;text-decoration:underline}
+.stats{display:flex;gap:28px;flex-wrap:wrap;padding:18px 0}
+.stat b{display:block;font-family:var(--serif);font-size:30px;line-height:1.1}
+.stat span{color:var(--muted);font-size:14px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;padding:12px 0 16px}
+.tools .field{margin:0;min-width:110px}
+.tools .field.grow{flex:1 1 180px}
+.tools .actions{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.tablebox{overflow-x:auto;border:1px solid var(--rule);border-radius:10px;background:var(--surface)}
+table.list{width:100%;border-collapse:collapse;font-size:15px;min-width:760px}
+table.list th,table.list td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--rule);white-space:nowrap}
+table.list th{background:var(--fill);font-weight:600;font-size:14px}
+table.list tr:last-child td{border-bottom:none}
+table.list td.nm{font-weight:600}
+table.list td.acts{text-align:right}
+table.list td.acts .btn{margin-left:4px}
+.badge{display:inline-block;font-size:12px;border:1px solid var(--red);color:var(--red);border-radius:999px;padding:0 8px;margin-left:6px;font-weight:600}
+.empty{padding:40px 16px;text-align:center;color:var(--muted)}
+.busy{position:fixed;inset:0;z-index:40;background:rgba(10,12,18,.45);display:flex;align-items:center;justify-content:center}
+.busy div{background:var(--surface);padding:18px 24px;border-radius:10px;font-weight:600}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ======================= STUDENT VIEW ======================= -->
+<div id="student">
+  <div class="wrap">
+    <header class="mast">
+      <div class="mast-top">
+        <span>1학년 국어 [9국05-02] 수행평가</span>
+        <button class="linkbtn" id="open-admin" type="button">선생님 관리함</button>
+      </div>
+      <h1>주장하는 글 쓰기</h1>
+      <p class="mast-meta">4. 더불어 살아가는 힘 (2) 단원 평가입니다. 모든 칸을 채워야 제출할 수 있고, 제출한 답안은 PDF 답안지로 선생님께 보관됩니다. 총 15점.</p>
+      <div class="seal" aria-label="평가자 김근혜"><small>평가자</small><b>김근혜</b></div>
+    </header>
+
+    <div id="conn-notice" class="notice" hidden></div>
+
+    <form id="exam" autocomplete="off" onsubmit="return false">
+      <div class="idline" id="idline">
+        <span class="grp" data-f="grade">
+          <select id="f-grade" aria-label="학년">
+            <option value="">선택</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
+          </select>학년
+        </span>
+        <span class="grp" data-f="cls"><span class="paren">(</span><input id="f-cls" class="n2" inputmode="numeric" maxlength="2" aria-label="반"><span class="paren">)</span>반</span>
+        <span class="grp" data-f="num"><span class="paren">(</span><input id="f-num" class="n2" inputmode="numeric" maxlength="2" aria-label="번호"><span class="paren">)</span>번</span>
+        <span class="grp" data-f="name">이름<span class="paren">(</span><input id="f-name" class="nm" maxlength="20" aria-label="이름"><span class="paren">)</span></span>
+      </div>
+      <p class="hint">쓰는 동안 내용은 이 기기에 임시로 저장됩니다. 새로고침해도 사라지지 않아요.</p>
+
+      <!-- 문항 1 -->
+      <section class="q">
+        <div class="qhead"><h2>평가 문항 1</h2><span class="pts">4점</span></div>
+        <p class="qlead">아래 대화를 바탕으로 물음에 답하시오.</p>
+        <div class="passage">
+          <dl class="dlg">
+            <dt>학생 1</dt><dd>우리 다음 주에 있을 동아리 연설 대회에 앞서 함께 연설문 초안을 작성해 보기로 했잖아. 오늘은 그 전에 우리가 함께 자료부터 정리해 보자.</dd>
+            <dt>학생 2</dt><dd>맞아. 연설 주제는 '전동킥보드 이용 가능 연령을 만 16세에서 만 18세 이상으로 변경해야 한다.'였어. 우리는 찬성하는 입장이니까 이를 뒷받침할 근거에 대해 함께 이야기해 보자.</dd>
+            <dt>학생 1</dt><dd>좋아. 나는 한국도로교통공단 자료에 따르면 미성년자가 일으킨 전동킥보드 사고 비율이 2020년 20%에서 2024년 45%로 크게 늘었다는 점을 근거로 들고 싶어.</dd>
+            <dt>학생 2</dt><dd>좋은 자료네. 나는 실제 사고 사례를 근거로 들고 싶어. 2025년 6월 일산 호수공원에서 산책 중이던 60대 부부가 고등학생이 운전한 전동킥보드와 충돌해서 아내가 숨지는 사고가 있었거든.</dd>
+            <dt>학생 3</dt><dd>나도 근거를 하나 생각해 봤어. 우리 동네에서도 청소년들이 전동킥보드를 위험하게 타는 모습을 자주 볼 수 있어. 그래서 연령을 올려야 한다는 생각이 들어.</dd>
+            <dt>학생 1</dt><dd>음… 그 근거는 좀 다시 생각해 봐야 할 것 같은데. 이전 수업에서 선생님께서 타당한 근거의 조건 세 가지에 대해 설명해 주셨잖아. 기억나?</dd>
+            <dt>학생 3</dt><dd>아! 근거는 주장과 관련이 있어야 하고, 근거는 주장을 뒷받침해야 하고, 근거는 출처가 명확하고 믿을 만해야 한다는 거지? 다시 생각해 보니 내 근거는 그중 한 가지에 어긋나는 것 같아. 그렇다면 내 근거는 제외하는 것이 좋겠다.</dd>
+            <dt>학생 2</dt><dd>좋아. 그럼 우리 이렇게 정리한 내용을 바탕으로 함께 연설문을 작성해 보자.</dd>
+          </dl>
+        </div>
+
+        <div class="sub" data-f="q1_1">
+          <label class="prompt" for="f-q1_1"><span class="no">1)</span>대화를 바탕으로 연설문을 작성한다고 할 때, 연설문에 포함될 학생들의 주장과 이유를 서술하시오.<span class="p">(2점)</span></label>
+          <textarea id="f-q1_1" class="ans"></textarea>
+          <div class="meta-row"><span></span><span class="cnt" data-for="q1_1">0자</span></div>
+        </div>
+
+        <div class="sub" data-f="q1_2">
+          <label class="prompt" for="f-q1_2"><span class="no">2)</span>대화를 참고하여 학생 3이 제시한 근거가 적절하지 않은 이유를 서술하시오.<span class="p">(2점)</span></label>
+          <div class="cond"><b>&lt;조건&gt;</b><ul>
+            <li>해당하는 타당한 근거의 조건을 제시할 것.</li>
+            <li>학생 3이 제시한 근거의 구체적인 문제점을 제시할 것.</li></ul></div>
+          <textarea id="f-q1_2" class="ans"></textarea>
+          <div class="meta-row"><span></span><span class="cnt" data-for="q1_2">0자</span></div>
+        </div>
+      </section>
+
+      <!-- 문항 2 -->
+      <section class="q">
+        <div class="qhead"><h2>평가 문항 2</h2><span class="pts">3점</span></div>
+        <p class="qlead">(가)~(나)의 내용을 바탕으로 물음에 답하시오.</p>
+        <div class="passage">
+          <p><span class="tag">(가)</span>안녕하세요. 저희는 오늘 '전동킥보드 이용 가능 연령을 만 16세에서 만 18세 이상으로 변경해야 한다.'는 주제로 연설을 시작하려고 합니다.</p>
+          <p>한국도로교통공단 자료에 따르면 최근 5년간 전동킥보드로 인한 사고가 약 2.5배 늘어났습니다. 그리고 미성년자가 일으킨 전동킥보드 사고 비율도 2020년 20%에서 2024년 45%로 크게 늘었습니다. 또한 2025년 6월 일산 호수공원에서는 산책 중이던 60대 부부가 고등학생이 운전한 전동킥보드와 충돌하여 아내가 숨지는 사고가 발생하기도 하였습니다. 이처럼 미성년자가 운전하는 전동킥보드는 반드시 인명 사고를 일으킵니다.</p>
+          <p>이러한 사고를 막기 위해서는 전동킥보드 이용 가능 연령을 만 18세 이상으로 올려야 합니다. 자동차 면허도 만 18세 이상부터 취득할 수 있는 것처럼, 도로 위에서 차량과 함께 다니는 전동킥보드 역시 같은 기준이 필요합니다. 우리 모두의 안전한 일상을 위해 이용 가능 연령을 만 18세 이상으로 변경하는 것에 함께 힘을 모아 주시기 바랍니다.</p>
+        </div>
+        <div class="passage">
+          <p><span class="tag">(나)</span>주장하는 글을 쓸 때에는 명확하고 객관적인 표현을 사용해야 한다. 그러나 다음과 같은 표현은 글의 설득력을 떨어뜨리므로 주의해야 한다. 첫째, 모호한 표현은 말하려는 내용을 명확하게 전달하지 못하는 표현으로, '적당히', '~지만 아닐 수도 있다.', '어느 정도' 등과 같이 그 의미가 분명하지 않은 표현이 이에 해당한다. 둘째, 주관적 표현은 개인의 생각이나 감정에만 치우친 느낌을 주는데, '저는', '제 생각에', '~것 같다' 등과 같이 글쓴이의 감정이 강하게 드러나는 표현이 이에 해당한다. 셋째, 단정적 표현은 어떠한 사실을 딱 잘라서 판단하거나 결정하여 사실을 왜곡할 수 있는 표현으로, '반드시', '절대로', '결코' 등과 같은 표현이 이에 해당한다. 따라서 주장하는 글을 쓸 때에는 이러한 표현을 피하고 명확하고 객관적인 표현을 사용해야 한다.</p>
+        </div>
+        <div class="sub" data-f="q2_1">
+          <label class="prompt" for="f-q2_1"><span class="no">1)</span>(나)를 참고하여 (가)에서 적절하지 않은 표현이 쓰인 문장을 찾아 이유와 함께 작성하고, 해당 문장을 적절한 표현으로 고쳐 쓰시오.<span class="p">(3점)</span></label>
+          <textarea id="f-q2_1" class="ans tall"></textarea>
+          <div class="meta-row"><span></span><span class="cnt" data-for="q2_1">0자</span></div>
+        </div>
+      </section>
+
+      <!-- 논술형 -->
+      <section class="q">
+        <div class="qhead"><h2>논술형</h2><span class="pts">8점</span></div>
+        <p class="qlead">(가)~(다)의 내용을 바탕으로 물음에 답하시오.</p>
+        <div class="passage">
+          <p><span class="tag">(가)</span>한국도로교통공단에 따르면, 전동킥보드와 같은 개인형 이동장치(Personal Mobility, PM) 관련 교통사고는 2020년 897건에서 2024년 2,232건으로 5년 만에 약 2.5배 늘었다. 특히 미성년자가 사고를 일으킨 비율은 같은 기간 20%에서 45%로 늘었다. 현재 우리나라에서는 만 16세 이상이면서 원동기 면허를 가진 사람만 전동킥보드를 운전할 수 있다. 그러나 최근 잇따른 사고로 이용 가능 연령을 자동차 면허 취득 가능 연령인 만 18세 이상으로 올려야 한다는 주장이 제기되고 있다.</p>
+          <p><span class="tag">(나)</span>경찰청에 따르면 2022년부터 2024년까지 3년 동안 발생한 전동킥보드 사고에서 무면허 운전 사고가 매년 1,100건이 넘었으며, 전체 사고의 절반 가량을 차지했다. 이는 사고의 핵심 원인이 나이가 아니라 면허 없이 운전하는 것임을 보여준다. 또한 국토교통부에 따르면 2018년부터 2022년까지의 개인형 이동장치 사고에서 20대가 30.7%로 가장 많았고, 30대가 13.6%, 40대가 8.7%였다. 충주에서는 전동킥보드를 타고 가던 대학생이 차에 치여 숨지는 사고도 있었다. 한편 2025년 12월에는 전동킥보드 대여 업체가 이용자의 면허와 나이를 확인하도록 의무화하는 법안이 국회 법안소위를 통과했다. 이 법이 시행되면 무면허 청소년의 이용을 막을 수 있는 제도적 장치가 마련된다.</p>
+          <p><span class="tag">(다)</span>한국도로교통공단에 따르면 미성년자가 가해자인 전동킥보드 사고 비율은 2020년 20%에서 2024년 45%로 크게 늘었다. 미성년자 전체 교통사고 중 전동킥보드가 차지하는 비중도 4년 만에 약 7배가 되었다. 실제로 2025년 6월 일산 호수공원에서는 산책 중이던 60대 부부가 고등학생이 운전한 전동킥보드와 충돌해 아내가 숨지는 사고가 일어났다. 서울 서초구에서도 17세 여학생 두 명이 탄 전동킥보드가 택시와 부딪혀 한 명이 사망했다. 한국도로교통공단 관계자에 따르면 개인형 이동장치는 편리한 교통수단이지만 신체를 보호해 줄 차체가 없어 사고가 나면 큰 피해를 입을 수 있다. 청소년은 위험한 상황에서 빠르게 판단하기 어려운 경우가 많아 더욱 주의가 필요하다는 의견도 함께 나오고 있다.</p>
+        </div>
+        <div class="sub">
+          <p class="prompt" style="font-weight:600;margin:0 0 10px"><span style="color:var(--pen);margin-right:6px">1)</span>최근 전동킥보드가 여러 인명 피해를 유발하면서, 전동킥보드 이용을 제한해야 한다는 주장이 제기되고 있다. ‘전동킥보드 이용 가능 연령을 만 16세에서 만 18세 이상으로 변경해야 한다.’는 주장에 대해, 자신의 생각을 (가)~(다)를 활용하여 논술하시오.</p>
+          <div class="cond"><b>&lt;조건&gt;</b><ul>
+            <li>자신의 주장을 명시적으로 제시할 것.</li>
+            <li>서론-본론-결론의 구조로 글을 쓰고, "[서론]", "[본론]", "[결론]"을 사용하여 구조를 드러낼 것.</li>
+            <li>두 개의 이유를 제시하고, 한 문단에는 하나의 이유만 담을 것.</li>
+            <li>자료를 활용하여 근거를 들고, 반드시 출처를 제시할 것. ((나)에 따르면~)</li></ul></div>
+
+          <div class="essay-part" data-f="e_intro">
+            <label for="f-e_intro">[서론]</label>
+            <textarea id="f-e_intro" class="ans"></textarea>
+            <div class="meta-row"><span></span><span class="cnt" data-for="e_intro">0자</span></div>
+          </div>
+          <div class="essay-part" data-f="e_body">
+            <label for="f-e_body">[본론]</label>
+            <textarea id="f-e_body" class="ans tall" style="min-height:20em" placeholder="이유 두 가지를 문단을 나누어 쓰세요. (Enter로 문단 나누기)"></textarea>
+            <div class="meta-row"><span></span><span class="cnt" data-for="e_body">0자</span></div>
+          </div>
+          <div class="essay-part" data-f="e_concl">
+            <label for="f-e_concl">[결론]</label>
+            <textarea id="f-e_concl" class="ans"></textarea>
+            <div class="meta-row"><span></span><span class="cnt" data-for="e_concl">0자</span></div>
+          </div>
+        </div>
+      </section>
+    </form>
+  </div>
+
+  <div class="bar" id="bar">
+    <div class="wrap">
+      <div class="prog" aria-live="polite">
+        <strong id="p-count">0 / 10칸 작성</strong>
+        <div class="track"><div class="fillbar" id="p-fill"></div></div>
+        <div class="left" id="p-left">학년, 반, 번호, 이름과 모든 문항을 채워 주세요.</div>
+      </div>
+      <button class="btn" id="goto-missing" type="button">빈칸으로 이동</button>
+      <button class="btn primary" id="submit" type="button" disabled>제출하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- after submit -->
+<div id="done" hidden>
+  <div class="wrap">
+    <div class="done">
+      <h2>제출했습니다</h2>
+      <p class="who" id="done-who"></p>
+      <p class="when" id="done-when"></p>
+      <p>답안은 PDF 답안지로 선생님 드라이브에 보관되었습니다. 내 답안을 파일로 갖고 싶다면 아래 버튼을 누르세요.</p>
+      <div class="row">
+        <button class="btn primary" id="done-pdf" type="button">내 답안 PDF 저장</button>
+        <button class="btn" id="done-new" type="button">새 답안 쓰기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= ADMIN VIEW ======================= -->
+<div id="admin" hidden>
+  <div class="admin-wrap">
+    <div class="admin-top">
+      <div><h1>선생님 관리함</h1><p>주장하는 글 쓰기 답안지 보관함 · 평가자 김근혜</p></div>
+      <div class="row">
+        <button class="btn sm" id="adm-refresh" type="button" hidden>새로고침</button>
+        <a class="btn sm" id="adm-drive" href="#" target="_blank" rel="noopener" hidden style="text-decoration:none">드라이브 폴더 열기</a>
+        <button class="btn sm" id="adm-pw" type="button" hidden>비밀번호 변경</button>
+        <button class="btn sm" id="adm-lock" type="button" hidden>관리함 잠그기</button>
+        <button class="btn sm" id="adm-back" type="button">학생 화면으로</button>
+      </div>
+    </div>
+
+    <div id="gate" class="gate">
+      <h2 id="gate-title">잠겨 있는 관리함</h2>
+      <p id="gate-desc">비밀번호를 입력하면 학생 답안지를 볼 수 있습니다.</p>
+      <form id="gate-form" onsubmit="return false" hidden>
+        <label class="field" id="gate-old-wrap" hidden><span>현재 비밀번호</span><input type="password" id="gate-old" autocomplete="current-password"></label>
+        <label class="field"><span id="gate-pw-label">비밀번호</span><input type="password" id="gate-pw" autocomplete="current-password"></label>
+        <label class="field" id="gate-pw2-wrap" hidden><span>비밀번호 확인</span><input type="password" id="gate-pw2" autocomplete="new-password"></label>
+        <p class="err" id="gate-err"></p>
+        <button class="btn primary" id="gate-go" type="submit" style="width:100%">열기</button>
+      </form>
+      <div class="alt" id="gate-alt" hidden></div>
+    </div>
+
+    <div id="dash" hidden>
+      <div class="stats" id="stats"></div>
+      <div class="tools">
+        <label class="field"><span>학년</span><select id="flt-grade"><option value="">전체</option></select></label>
+        <label class="field"><span>반</span><select id="flt-cls"><option value="">전체</option></select></label>
+        <label class="field grow"><span>이름 검색</span><input id="flt-q" placeholder="이름 일부"></label>
+        <label class="field"><span>정렬</span><select id="flt-sort"><option value="roll">반·번호순</option><option value="new">최근 제출순</option><option value="old">먼저 제출순</option></select></label>
+        <div class="actions">
+          <button class="btn sm" id="act-pdf" type="button">선택한 답안 PDF 저장</button>
+          <button class="btn sm" id="act-csv" type="button">목록 CSV 저장</button>
+        </div>
+      </div>
+      <div class="tablebox">
+        <table class="list">
+          <thead><tr>
+            <th><input type="checkbox" id="chk-all" aria-label="전체 선택"></th>
+            <th>학년</th><th>반</th><th>번호</th><th>이름</th><th>제출 일시</th><th>글자 수</th><th style="text-align:right">답안지</th>
+          </tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="empty" id="empty" hidden>아직 제출된 답안이 없습니다.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+<div id="toast" class="toast" role="status" hidden></div>
+<div id="busy" class="busy" hidden><div id="busy-msg">PDF 만드는 중…</div></div>
+
+<script>
+(function(){
+'use strict';
+/* ==================================================================
+   설정: Apps Script 배포 후 받은 "웹 앱 URL"을 아래 따옴표 안에 붙여 넣으세요.
+   ================================================================== */
+var API_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+
+/* ---------- constants ---------- */
+var TITLE = '주장하는 글 쓰기';
+var EVALUATOR = '김근혜';
+var DRAFT_KEY = 'essay-9k0502-draft-v1';
+var QUESTIONS = [
+  {key:'q1_1', head:'평가 문항 1 - 1)', pts:2, prompt:'대화를 바탕으로 연설문을 작성한다고 할 때, 연설문에 포함될 학생들의 주장과 이유를 서술하시오.'},
+  {key:'q1_2', head:'평가 문항 1 - 2)', pts:2, prompt:'대화를 참고하여 학생 3이 제시한 근거가 적절하지 않은 이유를 서술하시오. (타당한 근거의 조건과 구체적 문제점 제시)'},
+  {key:'q2_1', head:'평가 문항 2 - 1)', pts:3, prompt:'(나)를 참고하여 (가)에서 적절하지 않은 표현이 쓰인 문장을 찾아 이유와 함께 작성하고, 해당 문장을 적절한 표현으로 고쳐 쓰시오.'}
+];
+var ESSAY = {head:'논술형 1)', pts:8, prompt:"'전동킥보드 이용 가능 연령을 만 16세에서 만 18세 이상으로 변경해야 한다.'는 주장에 대해, 자신의 생각을 (가)~(다)를 활용하여 논술하시오.",
+  parts:[{key:'e_intro',label:'[서론]'},{key:'e_body',label:'[본론]'},{key:'e_concl',label:'[결론]'}]};
+var FIELDS = [
+  {key:'grade',label:'학년'},{key:'cls',label:'반'},{key:'num',label:'번호'},{key:'name',label:'이름'},
+  {key:'q1_1',label:'문항 1-1)'},{key:'q1_2',label:'문항 1-2)'},{key:'q2_1',label:'문항 2-1)'},
+  {key:'e_intro',label:'서론'},{key:'e_body',label:'본론'},{key:'e_concl',label:'결론'}
+];
+var ANSWER_KEYS = ['q1_1','q1_2','q2_1','e_intro','e_body','e_concl'];
+
+/* ---------- helpers ---------- */
+function $(s){return document.querySelector(s)}
+function el(tag, attrs){
+  var e=document.createElement(tag); attrs=attrs||{};
+  for(var k in attrs){ if(k==='text') e.textContent=attrs[k]; else if(k==='cls') e.className=attrs[k]; else if(k.slice(0,2)==='on') e.addEventListener(k.slice(2),attrs[k]); else e.setAttribute(k,attrs[k]); }
+  for(var i=2;i<arguments.length;i++){var c=arguments[i]; if(c==null) continue; e.appendChild(typeof c==='string'?document.createTextNode(c):c);}
+  return e;
+}
+var toastTimer;
+function toast(msg){var t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(function(){t.hidden=true},3500);}
+function busy(on,msg){$('#busy').hidden=!on; if(msg) $('#busy-msg').textContent=msg;}
+function fmtDate(ts){var d=new Date(ts); var p=function(n){return String(n).padStart(2,'0')};
+  return d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate()+'. '+p(d.getHours())+':'+p(d.getMinutes());}
+function charCount(s){return String(s||'').replace(/\s/g,'').length}
+function safeName(s){return String(s).replace(/[\\/:*?"<>|\s]+/g,'_')}
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function lsDel(k){try{localStorage.removeItem(k)}catch(e){}}
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
+
+/* ---------- server (Google Apps Script) ---------- */
+var API_READY = /^https:\/\/script\.google\.com\/.+\/exec$/.test(API_URL);
+if(!API_READY){ var n=$('#conn-notice'); n.hidden=false; n.textContent='아직 답안 저장소가 연결되지 않았습니다. index.html 위쪽의 API_URL에 Apps Script 웹 앱 주소를 넣어 주세요.'; }
+async function api(action,payload){
+  if(!API_READY) throw new Error('저장소 주소가 설정되지 않았습니다.');
+  var body=JSON.stringify(Object.assign({action:action},payload||{}));
+  var res, lastErr;
+  for(var attempt=0;attempt<2;attempt++){
+    try{
+      res=await fetch(API_URL,{method:'POST',body:body,redirect:'follow'}); // text/plain → 사전 요청 없음
+      var data=await res.json();
+      if(!data.ok) { var er=new Error(data.error||'요청 실패'); er.server=true; throw er; }
+      return data;
+    }catch(e){ lastErr=e; if(e.server) throw e; await sleep(800); }
+  }
+  throw lastErr;
+}
+function blobToBase64(blob){
+  return new Promise(function(res,rej){ var r=new FileReader(); r.onload=function(){res(String(r.result).split(',')[1])}; r.onerror=rej; r.readAsDataURL(blob); });
+}
+function base64ToBlob(b64,type){ var b=atob(b64); var a=new Uint8Array(b.length); for(var i=0;i<b.length;i++) a[i]=b.charCodeAt(i); return new Blob([a],{type:type}); }
+
+/* ============================================================
+   PDF: draw answer sheet on canvases, then pack as JPEG pages
+   ============================================================ */
+var PW=1240, PH=1754, MX=104, MT=112, MB=120;
+var CW=PW-MX*2;
+var SANS='"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif';
+var SERIF='"Gowun Batang","AppleMyungjo","Batang",serif';
+var C={ink:'#1C2438',muted:'#5A6275',rule:'#C9CED8',fill:'#EEF1F5',pen:'#1B3A8F',line:'#E3E7EE'};
+
+var fontsReady=null;
+function loadFonts(){
+  if(fontsReady) return fontsReady;
+  var specs=['400 20px "IBM Plex Sans KR"','600 20px "IBM Plex Sans KR"','700 20px "IBM Plex Sans KR"','400 20px "Gowun Batang"','700 20px "Gowun Batang"'];
+  fontsReady = Promise.all(specs.map(function(s){return document.fonts?document.fonts.load(s,'가나다').catch(function(){}):null}))
+    .then(function(){return Promise.race([document.fonts?document.fonts.ready:null, sleep(2500)])});
+  return fontsReady;
+}
+
+function wrapText(ctx, text, maxW){
+  var out=[];
+  String(text||'').replace(/\r/g,'').split('\n').forEach(function(para){
+    if(!para.trim()){ out.push(''); return; }
+    var tokens=para.split(/(\s+)/), line='';
+    tokens.forEach(function(w){
+      if(!w) return;
+      if(ctx.measureText(line+w).width<=maxW){ line+=w; return; }
+      if(/^\s+$/.test(w)){ out.push(line.replace(/\s+$/,'')); line=''; return; }
+      if(line.trim()){ out.push(line.replace(/\s+$/,'')); line=''; }
+      var chunk='';
+      Array.from(w).forEach(function(ch){
+        if(ctx.measureText(chunk+ch).width>maxW && chunk){ out.push(chunk); chunk=ch; } else chunk+=ch;
+      });
+      line=chunk;
+    });
+    out.push(line.replace(/\s+$/,''));
+  });
+  while(out.length && out[out.length-1]==='') out.pop();
+  return out;
+}
+
+function renderSheet(rec){
+  var pages=[], ctx, y;
+  var who=rec.grade+'학년 '+rec.cls+'반 '+rec.num+'번 '+rec.name;
+  function newPage(){
+    var cv=document.createElement('canvas'); cv.width=PW; cv.height=PH;
+    ctx=cv.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,PW,PH);
+    ctx.textBaseline='alphabetic';
+    pages.push(cv);
+    y=MT;
+    if(pages.length>1){
+      ctx.font='400 20px '+SANS; ctx.fillStyle=C.muted;
+      ctx.fillText(TITLE+' 답안지 (이어서)',MX,MT-40);
+      ctx.textAlign='right'; ctx.fillText(who,PW-MX,MT-40); ctx.textAlign='left';
+      hline(MT-26,1,C.rule);
+      y=MT+10;
+    }
+  }
+  function hline(yy,w,col){ctx.fillStyle=col;ctx.fillRect(MX,yy,CW,w);}
+  function need(h){ if(y+h>PH-MB) newPage(); }
+  function textBlock(txt,font,color,lh,indent,opts){
+    opts=opts||{};
+    ctx.font=font; var lines=wrapText(ctx,txt,CW-indent-(opts.padR||0));
+    if(!lines.length) lines=[''];
+    lines.forEach(function(ln){
+      need(lh);
+      if(opts.bar){ ctx.fillStyle=opts.bar; ctx.fillRect(MX+6,y,4,lh); ctx.fillStyle=C.line; ctx.fillRect(MX+indent,y+lh-1,CW-indent,1); }
+      ctx.font=font; ctx.fillStyle=color; ctx.fillText(ln,MX+indent,y+lh*0.68);
+      y+=lh;
+    });
+  }
+  function table(cols,rows,widths,rowH){
+    var total=rowH*rows.length; need(total);
+    var x=MX, top=y;
+    ctx.fillStyle=C.fill; ctx.fillRect(MX,top,CW,rowH);
+    ctx.strokeStyle=C.ink; ctx.lineWidth=2; ctx.strokeRect(MX,top,CW,total);
+    ctx.lineWidth=1; ctx.strokeStyle=C.rule;
+    for(var r=1;r<rows.length;r++){ctx.beginPath();ctx.moveTo(MX,top+rowH*r);ctx.lineTo(MX+CW,top+rowH*r);ctx.stroke();}
+    var acc=0;
+    widths.forEach(function(w,i){
+      var cx=MX+acc*CW, cw=w*CW;
+      if(i>0){ctx.beginPath();ctx.moveTo(cx,top);ctx.lineTo(cx,top+total);ctx.stroke();}
+      rows.forEach(function(row,r){
+        var v=row[i]==null?'':String(row[i]);
+        ctx.font=(r===0?'600 21px ':'500 24px ')+SANS; ctx.fillStyle=r===0?C.muted:C.ink;
+        if(r>0 && cols[i]==='이름') ctx.font='700 25px '+SANS;
+        ctx.textAlign='center';
+        var t=v; while(ctx.measureText(t).width>cw-16 && t.length>1) t=t.slice(0,-1);
+        ctx.fillText(t,cx+cw/2,top+rowH*r+rowH*0.64);
+        ctx.textAlign='left';
+      });
+      acc+=w;
+    });
+    y=top+total;
+  }
+
+  newPage();
+  // title zone
+  ctx.font='500 21px '+SANS; ctx.fillStyle=C.muted;
+  ctx.fillText('1학년 국어 수행평가  [9국05-02]  4. 더불어 살아가는 힘 (2)',MX,y);
+  ctx.textAlign='right'; ctx.fillText('평가자  '+EVALUATOR,PW-MX,y); ctx.textAlign='left';
+  y+=18; hline(y,3,C.ink); y+=74;
+  ctx.font='700 54px '+SERIF; ctx.fillStyle=C.ink; ctx.fillText(TITLE+' 답안지',MX,y); y+=40;
+
+  table(['학년','반','번호','이름','제출 일시'],[['학년','반','번호','이름','제출 일시'],[rec.grade,rec.cls,rec.num,rec.name,fmtDate(rec.ts)]],[.13,.13,.13,.26,.35],56);
+  y+=22;
+  table(['','1-1)','1-2)','2-1)','논술형','합계'],[['문항','1 - 1)','1 - 2)','2 - 1)','논술형','합계'],['배점','2점','2점','3점','8점','15점'],['득점','','','','','']],[.16,.14,.14,.14,.2,.22],50);
+  y+=46;
+
+  function questionHead(head,pts,prompt){
+    need(140);
+    ctx.font='700 27px '+SANS; ctx.fillStyle=C.ink; ctx.fillText(head,MX,y+28);
+    var hw=ctx.measureText(head).width;
+    ctx.font='500 21px '+SANS; ctx.fillStyle=C.muted; ctx.fillText('('+pts+'점)',MX+hw+12,y+28);
+    y+=44;
+    textBlock(prompt,'400 21px '+SANS,C.muted,34,0);
+    y+=10;
+  }
+  QUESTIONS.forEach(function(q){
+    questionHead(q.head,q.pts,q.prompt);
+    textBlock(rec.answers[q.key],'400 25px '+SERIF,C.pen,48,26,{bar:C.pen});
+    y+=40;
+  });
+  questionHead(ESSAY.head,ESSAY.pts,ESSAY.prompt);
+  ESSAY.parts.forEach(function(p){
+    need(100);
+    ctx.font='700 25px '+SERIF; ctx.fillStyle=C.ink; ctx.fillText(p.label,MX+26,y+30); y+=46;
+    textBlock(rec.answers[p.key],'400 25px '+SERIF,C.pen,48,26,{bar:C.pen});
+    y+=22;
+  });
+  y+=30; need(80);
+  hline(y,1,C.rule); y+=50;
+  ctx.font='500 23px '+SANS; ctx.fillStyle=C.ink; ctx.textAlign='right';
+  ctx.fillText('평가자  '+EVALUATOR+'     (서명)',PW-MX,y); ctx.textAlign='left';
+
+  // page numbers
+  pages.forEach(function(cv,i){
+    var c=cv.getContext('2d'); c.font='400 19px '+SANS; c.fillStyle=C.muted; c.textAlign='center';
+    c.fillText((i+1)+' / '+pages.length,PW/2,PH-60);
+  });
+  return pages;
+}
+
+function b64ToBytes(u){var b=atob(u.split(',')[1]); var a=new Uint8Array(b.length); for(var i=0;i<b.length;i++) a[i]=b.charCodeAt(i); return a;}
+function buildPdf(jpegs){
+  var enc=new TextEncoder(), parts=[], len=0, offs=[];
+  function push(x){var u=typeof x==='string'?enc.encode(x):x; parts.push(u); len+=u.length;}
+  var n=jpegs.length, total=2+n*3;
+  push('%PDF-1.4\n');
+  offs[1]=len; push('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+  var kids=[]; for(var i=0;i<n;i++) kids.push((3+i*3)+' 0 R');
+  offs[2]=len; push('2 0 obj\n<< /Type /Pages /Kids ['+kids.join(' ')+'] /Count '+n+' >>\nendobj\n');
+  var content='q 595.28 0 0 841.89 0 0 cm /Im0 Do Q';
+  jpegs.forEach(function(j,i){
+    var pg=3+i*3, ct=pg+1, im=pg+2;
+    offs[pg]=len; push(pg+' 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 '+im+' 0 R >> >> /Contents '+ct+' 0 R >>\nendobj\n');
+    offs[ct]=len; push(ct+' 0 obj\n<< /Length '+content.length+' >>\nstream\n'+content+'\nendstream\nendobj\n');
+    offs[im]=len; push(im+' 0 obj\n<< /Type /XObject /Subtype /Image /Width '+PW+' /Height '+PH+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+j.length+' >>\nstream\n');
+    push(j); push('\nendstream\nendobj\n');
+  });
+  var xref=len;
+  var s='xref\n0 '+(total+1)+'\n0000000000 65535 f \n';
+  for(var k=1;k<=total;k++) s+=String(offs[k]).padStart(10,'0')+' 00000 n \n';
+  s+='trailer\n<< /Size '+(total+1)+' /Root 1 0 R >>\nstartxref\n'+xref+'\n%%EOF\n';
+  push(s);
+  return new Blob(parts,{type:'application/pdf'});
+}
+async function makePdf(recs,onStep){
+  await loadFonts();
+  var jpegs=[];
+  for(var i=0;i<recs.length;i++){
+    if(onStep) onStep(i,recs.length);
+    await sleep(0);
+    renderSheet(recs[i]).forEach(function(cv){ jpegs.push(b64ToBytes(cv.toDataURL('image/jpeg',0.85))); });
+  }
+  return buildPdf(jpegs);
+}
+function pdfName(rec){return safeName(rec.grade+'학년_'+rec.cls+'반_'+rec.num+'번_'+rec.name+'_주장하는글쓰기')+'.pdf'}
+function saveFile(filename,data){
+  var blob = data instanceof Blob ? data : new Blob([data],{type:'text/csv;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=el('a',{href:url,download:filename}); document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url)},30000);
+  toast('저장했습니다: '+filename);
+}
+async function downloadPdf(recs,filename){
+  busy(true,'PDF 만드는 중…');
+  try{
+    var blob=await makePdf(recs,function(i,n){ if(n>1) $('#busy-msg').textContent='PDF 만드는 중… '+(i+1)+' / '+n; });
+    busy(false); saveFile(filename,blob);
+  }catch(e){ busy(false); toast('PDF를 만들지 못했습니다.'); console.error(e); }
+}
+
+/* ============================================================
+   STUDENT
+   ============================================================ */
+function val(key){var e=$('#f-'+key); return e?e.value:'';}
+function isFilled(key){
+  var v=val(key).trim();
+  if(key==='grade') return /^[123]$/.test(v);
+  if(key==='cls'||key==='num') return /^\d{1,2}$/.test(v) && Number(v)>0;
+  return v.length>0;
+}
+function missingKeys(){return FIELDS.filter(function(f){return !isFilled(f.key)});}
+function updateProgress(){
+  var miss=missingKeys(), done=FIELDS.length-miss.length;
+  $('#p-count').textContent=done+' / '+FIELDS.length+'칸 작성';
+  $('#p-fill').style.width=(done/FIELDS.length*100)+'%';
+  $('#p-left').textContent = miss.length ? '남은 칸: '+miss.map(function(m){return m.label}).join(', ')
+    : (API_READY ? '모든 칸을 채웠습니다. 제출할 수 있습니다.' : '저장소가 연결되지 않아 제출할 수 없습니다.');
+  $('#submit').disabled = miss.length>0 || !API_READY;
+  $('#goto-missing').hidden = miss.length===0;
+  document.querySelectorAll('.missing-flag').forEach(function(n){ if(isFilled(n.getAttribute('data-f'))) n.classList.remove('missing-flag'); });
+  ANSWER_KEYS.forEach(function(k){ var c=document.querySelector('.cnt[data-for="'+k+'"]'); if(c) c.textContent=charCount(val(k))+'자'; });
+}
+var draftTimer;
+function saveDraft(){
+  clearTimeout(draftTimer);
+  draftTimer=setTimeout(function(){ var d={}; FIELDS.forEach(function(f){d[f.key]=val(f.key)}); lsSet(DRAFT_KEY,JSON.stringify(d)); },400);
+}
+function loadDraft(){
+  var raw=lsGet(DRAFT_KEY); if(!raw) return;
+  try{ var d=JSON.parse(raw); FIELDS.forEach(function(f){ if(d[f.key]!=null) $('#f-'+f.key).value=d[f.key]; }); }catch(e){}
+}
+FIELDS.forEach(function(f){
+  var e=$('#f-'+f.key);
+  e.addEventListener('input',function(){
+    if(f.key==='cls'||f.key==='num'){ var c=e.value.replace(/\D/g,''); if(c!==e.value) e.value=c; }
+    updateProgress(); saveDraft();
+  });
+  e.addEventListener('change',function(){updateProgress(); saveDraft();});
+});
+$('#goto-missing').addEventListener('click',function(){
+  var miss=missingKeys(); if(!miss.length) return;
+  miss.forEach(function(m){ var w=document.querySelector('[data-f="'+m.key+'"]'); if(w) w.classList.add('missing-flag'); });
+  var first=$('#f-'+miss[0].key);
+  first.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});
+  setTimeout(function(){first.focus({preventScroll:true})},350);
+});
+function collect(){
+  var ans={}; ANSWER_KEYS.forEach(function(k){ans[k]=val(k).trim()});
+  return {grade:Number(val('grade')),cls:Number(val('cls')),num:Number(val('num')),name:val('name').trim(),answers:ans};
+}
+function openModal(node){ var r=$('#modal-root'); r.innerHTML=''; var m=el('div',{cls:'modal'},node); m.addEventListener('click',function(e){if(e.target===m) closeModal();}); r.appendChild(m); var f=node.querySelector('button'); if(f) f.focus(); }
+function closeModal(){ $('#modal-root').innerHTML=''; }
+document.addEventListener('keydown',function(e){ if(e.key==='Escape' && $('#modal-root').firstChild) closeModal(); });
+
+var lastSubmitted=null, lastPdf=null;
+$('#submit').addEventListener('click',function(){
+  if(missingKeys().length || !API_READY) return;
+  var r=collect();
+  var go=el('button',{cls:'btn primary',type:'button',text:'제출하기'});
+  var d=el('div',{cls:'dialog',role:'dialog','aria-modal':'true'},
+    el('h3',{text:'답안을 제출할까요?'}),
+    el('p',{text:r.grade+'학년 '+r.cls+'반 '+r.num+'번 '+r.name}),
+    el('p',{style:'color:var(--muted);font-size:15px;margin:0',text:'제출한 뒤에는 답안을 고칠 수 없습니다. 학년, 반, 번호, 이름이 맞는지 한 번 더 확인하세요.'}),
+    el('div',{cls:'row'}, el('button',{cls:'btn',type:'button',text:'다시 확인하기',onclick:closeModal}), go));
+  go.addEventListener('click',async function(){
+    go.disabled=true; go.textContent='답안지 PDF 만드는 중…';
+    var rec=Object.assign({},r,{ts:Date.now()});
+    try{
+      var blob=await makePdf([rec]);
+      go.textContent='제출하는 중…';
+      var b64=await blobToBase64(blob);
+      await api('submit',{rec:rec,pdf:b64,filename:pdfName(rec)});
+      closeModal(); lastSubmitted=rec; lastPdf=blob; lsDel(DRAFT_KEY); showDone(rec);
+    }catch(e){
+      go.disabled=false; go.textContent='제출하기';
+      toast(e&&e.server ? '제출하지 못했습니다: '+e.message : '제출하지 못했습니다. 인터넷 연결을 확인하고 다시 눌러 주세요.');
+    }
+  });
+  openModal(d);
+});
+function showDone(rec){
+  $('#student').hidden=true; $('#done').hidden=false;
+  $('#done-who').textContent=rec.grade+'학년 '+rec.cls+'반 '+rec.num+'번 '+rec.name;
+  $('#done-when').textContent='제출 일시: '+fmtDate(rec.ts);
+  window.scrollTo(0,0);
+}
+$('#done-pdf').addEventListener('click',function(){ if(lastPdf) saveFile(pdfName(lastSubmitted),lastPdf); });
+$('#done-new').addEventListener('click',function(){
+  FIELDS.forEach(function(f){ $('#f-'+f.key).value=''; });
+  lastSubmitted=null; lastPdf=null; $('#done').hidden=true; $('#student').hidden=false; updateProgress(); window.scrollTo(0,0);
+});
+
+/* ============================================================
+   ADMIN (비밀번호는 서버에서 확인)
+   ============================================================ */
+var adminPw=null, subs=[], selected=new Set(), gateMode='login', pollTimer=null, folderUrl='';
+function showView(v){ $('#student').hidden = v!=='student'; $('#done').hidden=true; $('#admin').hidden = v!=='admin'; window.scrollTo(0,0); }
+$('#open-admin').addEventListener('click',function(){ showView('admin'); if(!adminPw) setupGate(); });
+$('#adm-back').addEventListener('click',function(){ showView('student'); if(lastSubmitted){ $('#student').hidden=true; $('#done').hidden=false; } });
+$('#adm-lock').addEventListener('click',lockAdmin);
+$('#adm-refresh').addEventListener('click',function(){ loadList(true); });
+
+function lockAdmin(){
+  adminPw=null; subs=[]; selected.clear(); clearInterval(pollTimer);
+  $('#dash').hidden=true; ['#adm-lock','#adm-pw','#adm-refresh','#adm-drive'].forEach(function(s){$(s).hidden=true});
+  setupGate();
+}
+function setupGate(){
+  $('#gate').hidden=false; $('#dash').hidden=true; $('#gate-alt').hidden=true;
+  if(!API_READY){ $('#gate-title').textContent='저장소가 연결되지 않았습니다'; $('#gate-desc').textContent='index.html의 API_URL에 Apps Script 웹 앱 주소를 넣어야 관리함을 쓸 수 있습니다.'; $('#gate-form').hidden=true; return; }
+  gateMode='login'; renderGate();
+}
+function renderGate(){
+  $('#gate-form').hidden=false; $('#gate-err').textContent='';
+  $('#gate-pw').value=''; $('#gate-pw2').value=''; $('#gate-old').value='';
+  var changing=gateMode==='change';
+  $('#gate-old-wrap').hidden=!changing; $('#gate-pw2-wrap').hidden=!changing;
+  $('#gate-pw-label').textContent=changing?'새 비밀번호 (4자 이상)':'비밀번호';
+  $('#gate-title').textContent=changing?'비밀번호 변경':'잠겨 있는 관리함';
+  $('#gate-desc').textContent=changing?'현재 비밀번호를 확인한 뒤 새 비밀번호로 바꿉니다.':'비밀번호를 입력하면 학생 답안지를 볼 수 있습니다.';
+  $('#gate-go').textContent=changing?'변경하기':'열기';
+  setTimeout(function(){ (changing?$('#gate-old'):$('#gate-pw')).focus(); },50);
+}
+$('#gate-form').addEventListener('submit',async function(){
+  var err=$('#gate-err'), pw=$('#gate-pw').value, btn=$('#gate-go'); err.textContent=''; btn.disabled=true;
+  try{
+    if(gateMode==='login'){
+      try{ await api('verify',{pw:pw}); }catch(e){ err.textContent=e.server?e.message:'연결하지 못했습니다. 잠시 후 다시 시도하세요.'; return; }
+      adminPw=pw; unlockAdmin(); return;
+    }
+    var old=$('#gate-old').value;
+    if(pw.length<4){ err.textContent='비밀번호는 4자 이상이어야 합니다.'; return; }
+    if(pw!==$('#gate-pw2').value){ err.textContent='두 비밀번호가 서로 다릅니다.'; return; }
+    try{ await api('changePw',{pw:old,newPw:pw}); }catch(e){ err.textContent=e.server?e.message:'연결하지 못했습니다.'; return; }
+    adminPw=pw; toast('비밀번호를 바꿨습니다.'); $('#gate').hidden=true; $('#dash').hidden=false;
+  } finally { btn.disabled=false; }
+});
+$('#adm-pw').addEventListener('click',function(){
+  gateMode='change'; $('#dash').hidden=true; $('#gate').hidden=false; renderGate();
+  var alt=$('#gate-alt'); alt.innerHTML=''; alt.hidden=false;
+  alt.appendChild(el('button',{type:'button',text:'변경하지 않고 돌아가기',onclick:function(){ $('#gate').hidden=true; $('#dash').hidden=false; }}));
+});
+function unlockAdmin(){
+  $('#gate').hidden=true; $('#dash').hidden=false;
+  ['#adm-lock','#adm-pw','#adm-refresh'].forEach(function(s){$(s).hidden=false});
+  loadList(true);
+  clearInterval(pollTimer);
+  pollTimer=setInterval(function(){ if(!document.hidden && adminPw && !$('#admin').hidden) loadList(false); },30000);
+}
+async function loadList(showBusy){
+  if(!adminPw) return;
+  if(showBusy) $('#adm-refresh').textContent='불러오는 중…';
+  try{
+    var r=await api('list',{pw:adminPw});
+    subs=r.items||[]; folderUrl=r.folderUrl||'';
+    var dr=$('#adm-drive'); dr.hidden=!folderUrl; if(folderUrl) dr.href=folderUrl;
+    var ids=new Set(subs.map(function(x){return x.id})); selected.forEach(function(i){ if(!ids.has(i)) selected.delete(i); });
+    renderFilters(); renderDash();
+  }catch(e){
+    if(e.server && /비밀번호/.test(e.message)){ toast('비밀번호가 바뀌었습니다. 다시 열어 주세요.'); lockAdmin(); }
+    else if(showBusy) toast('목록을 불러오지 못했습니다.');
+  }finally{ $('#adm-refresh').textContent='새로고침'; }
+}
+function renderFilters(){
+  function fill(sel,vals,suffix){
+    var cur=sel.value; sel.innerHTML=''; sel.appendChild(el('option',{value:'',text:'전체'}));
+    vals.forEach(function(v){ sel.appendChild(el('option',{value:String(v),text:v+suffix})); });
+    if(vals.map(String).indexOf(cur)>=0) sel.value=cur;
+  }
+  var grades=Array.from(new Set(subs.map(function(s){return s.grade}))).sort(function(a,b){return a-b});
+  fill($('#flt-grade'),grades,'학년');
+  var g=$('#flt-grade').value;
+  var cls=Array.from(new Set(subs.filter(function(s){return !g||String(s.grade)===g}).map(function(s){return s.cls}))).sort(function(a,b){return a-b});
+  fill($('#flt-cls'),cls,'반');
+}
+function visibleSubs(){
+  var g=$('#flt-grade').value, c=$('#flt-cls').value, q=$('#flt-q').value.trim(), so=$('#flt-sort').value;
+  var list=subs.filter(function(s){ return (!g||String(s.grade)===g)&&(!c||String(s.cls)===c)&&(!q||String(s.name).indexOf(q)>=0); });
+  list.sort(function(a,b){
+    if(so==='new') return b.ts-a.ts; if(so==='old') return a.ts-b.ts;
+    return a.grade-b.grade||a.cls-b.cls||a.num-b.num||a.ts-b.ts;
+  });
+  return list;
+}
+function renderDash(){
+  var counts={}; subs.forEach(function(s){ var k=s.grade+'-'+s.cls+'-'+s.num+'-'+s.name; counts[k]=(counts[k]||0)+1; });
+  var st=$('#stats'); st.innerHTML='';
+  [[subs.length,'제출된 답안지'],[Object.keys(counts).length,'제출한 학생'],[new Set(subs.map(function(s){return s.grade+'-'+s.cls})).size,'학급']].forEach(function(p){
+    st.appendChild(el('div',{cls:'stat'},el('b',{text:String(p[0])}),el('span',{text:p[1]}))); });
+  var list=visibleSubs(), tb=$('#rows'); tb.innerHTML='';
+  $('#empty').hidden = list.length>0;
+  $('#empty').textContent = subs.length ? '조건에 맞는 답안이 없습니다. 학년, 반, 이름 검색을 바꿔 보세요.' : '아직 제출된 답안이 없습니다. 학생들이 제출하면 여기에 나타납니다.';
+  list.forEach(function(s){
+    var k=s.grade+'-'+s.cls+'-'+s.num+'-'+s.name;
+    var chk=el('input',{type:'checkbox','aria-label':s.name+' 선택'}); chk.checked=selected.has(s.id);
+    chk.addEventListener('change',function(){ if(chk.checked) selected.add(s.id); else selected.delete(s.id); syncAll(); });
+    var total=ANSWER_KEYS.reduce(function(a,key){return a+charCount(s.answers&&s.answers[key])},0);
+    var nm=el('td',{cls:'nm',text:s.name}); if(counts[k]>1) nm.appendChild(el('span',{cls:'badge',text:counts[k]+'회 제출'}));
+    tb.appendChild(el('tr',null,
+      el('td',null,chk), el('td',{text:String(s.grade)}), el('td',{text:String(s.cls)}), el('td',{text:String(s.num)}), nm,
+      el('td',{text:fmtDate(s.ts)}), el('td',{text:total+'자'}),
+      el('td',{cls:'acts'},
+        el('button',{cls:'btn sm',type:'button',text:'보기',onclick:function(){preview(s)}}),
+        el('button',{cls:'btn sm',type:'button',text:'PDF',onclick:function(){downloadSaved(s)}}),
+        el('button',{cls:'btn sm danger',type:'button',text:'삭제',onclick:function(){confirmDelete(s)}}))));
+  });
+  syncAll();
+}
+function syncAll(){
+  var list=visibleSubs(), all=$('#chk-all');
+  var n=list.filter(function(s){return selected.has(s.id)}).length;
+  all.checked = list.length>0 && n===list.length; all.indeterminate = n>0 && n<list.length;
+  $('#act-pdf').textContent = selected.size ? '선택한 '+selected.size+'명 PDF 저장' : '보이는 답안 모두 PDF 저장';
+}
+$('#chk-all').addEventListener('change',function(e){ visibleSubs().forEach(function(s){ if(e.target.checked) selected.add(s.id); else selected.delete(s.id); }); renderDash(); });
+['#flt-grade','#flt-cls','#flt-sort'].forEach(function(s){ $(s).addEventListener('change',function(){ if(s==='#flt-grade') renderFilters(); renderDash(); }); });
+$('#flt-q').addEventListener('input',renderDash);
+
+async function downloadSaved(s){
+  busy(true,'드라이브에서 PDF 가져오는 중…');
+  try{ var r=await api('pdf',{pw:adminPw,id:s.id}); busy(false); saveFile(pdfName(s),base64ToBlob(r.data,'application/pdf')); }
+  catch(e){ busy(false); toast('저장된 파일을 찾지 못해 답안으로 새로 만듭니다.'); downloadPdf([s],pdfName(s)); }
+}
+$('#act-pdf').addEventListener('click',function(){
+  var recs = selected.size ? visibleSubs().filter(function(s){return selected.has(s.id)}) : visibleSubs();
+  if(selected.size && recs.length<selected.size){ var seen=new Set(recs.map(function(s){return s.id})); subs.forEach(function(s){ if(selected.has(s.id)&&!seen.has(s.id)) recs.push(s); }); }
+  if(!recs.length){ toast('저장할 답안이 없습니다.'); return; }
+  if(recs.length===1){ downloadSaved(recs[0]); return; }
+  var g=$('#flt-grade').value, c=$('#flt-cls').value;
+  downloadPdf(recs,safeName('주장하는글쓰기_답안지_'+(g?g+'학년_':'')+(c?c+'반_':'')+recs.length+'명')+'.pdf');
+});
+$('#act-csv').addEventListener('click',function(){
+  var list=visibleSubs(); if(!list.length){ toast('저장할 답안이 없습니다.'); return; }
+  var head=['학년','반','번호','이름','제출일시','1-1)','1-2)','2-1)','서론','본론','결론'];
+  var q=function(v){ return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'; };
+  var lines=[head.map(q).join(',')];
+  list.forEach(function(s){ lines.push([s.grade,s.cls,s.num,s.name,fmtDate(s.ts)].concat(ANSWER_KEYS.map(function(k){return s.answers[k]})).map(q).join(',')); });
+  saveFile('주장하는글쓰기_답안목록.csv','\uFEFF'+lines.join('\r\n'));
+});
+async function preview(s){
+  busy(true,'답안지 불러오는 중…'); await loadFonts(); var pages=renderSheet(s); busy(false);
+  var box=el('div',{cls:'pages'});
+  pages.forEach(function(cv,i){ box.appendChild(el('img',{src:cv.toDataURL('image/jpeg',0.9),alt:s.name+' 답안지 '+(i+1)+'쪽'})); });
+  openModal(el('div',{cls:'dialog wide',role:'dialog','aria-modal':'true'},
+    el('div',{cls:'dh'}, el('h3',{text:s.grade+'학년 '+s.cls+'반 '+s.num+'번 '+s.name}),
+      el('div',{style:'display:flex;gap:8px'},
+        el('button',{cls:'btn sm primary',type:'button',text:'PDF 저장',onclick:function(){downloadSaved(s)}}),
+        el('button',{cls:'btn sm',type:'button',text:'닫기',onclick:closeModal}))), box));
+}
+function confirmDelete(s){
+  var go=el('button',{cls:'btn danger',type:'button',text:'삭제하기'});
+  openModal(el('div',{cls:'dialog',role:'dialog','aria-modal':'true'},
+    el('h3',{text:'답안지를 삭제할까요?'}),
+    el('p',{text:s.grade+'학년 '+s.cls+'반 '+s.num+'번 '+s.name+' ('+fmtDate(s.ts)+' 제출)'}),
+    el('p',{style:'color:var(--muted);font-size:15px;margin:0',text:'스프레드시트의 행을 지우고 드라이브의 PDF는 휴지통으로 옮깁니다. (드라이브 휴지통에서 30일 안에 복구 가능)'}),
+    el('div',{cls:'row'}, el('button',{cls:'btn',type:'button',text:'취소',onclick:closeModal}), go)));
+  go.addEventListener('click',async function(){
+    go.disabled=true;
+    try{ await api('delete',{pw:adminPw,id:s.id}); selected.delete(s.id); subs=subs.filter(function(x){return x.id!==s.id}); closeModal(); renderFilters(); renderDash(); toast('삭제했습니다.'); }
+    catch(e){ go.disabled=false; toast('삭제하지 못했습니다.'); }
+  });
+}
+
+/* ---------- start ---------- */
+loadDraft(); updateProgress(); loadFonts();
+})();
+</script>
+</body>
+</html>
