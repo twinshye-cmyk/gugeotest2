@@ -177,12 +177,11 @@ table.list td.acts .btn{margin-left:4px}
   <div class="wrap">
     <header class="mast">
       <div class="mast-top">
-        <span>1학년 국어 [9국05-02] 수행평가</span>
+        <span>1학년 국어 [9국05-02] 수행평가 (평가자 김근혜)</span>
         <button class="linkbtn" id="open-admin" type="button">선생님 관리함</button>
       </div>
       <h1>주장하는 글 쓰기</h1>
       <p class="mast-meta">4. 더불어 살아가는 힘 (2) 단원 평가입니다. 모든 칸을 채워야 제출할 수 있고, 제출한 답안은 PDF 답안지로 선생님께 보관됩니다. 총 15점.</p>
-      <div class="seal" aria-label="평가자 김근혜"><small>평가자</small><b>김근혜</b></div>
     </header>
 
     <div id="conn-notice" class="notice" hidden></div>
@@ -483,101 +482,134 @@ function wrapText(ctx, text, maxW){
   return out;
 }
 
+/* 문제지 본문을 화면(HTML)에서 그대로 읽어 온다 */
+function examContent(){
+  var secs=document.querySelectorAll('#exam section.q');
+  function paras(sec){
+    var out=[];
+    sec.querySelectorAll('.passage').forEach(function(box){
+      var ps=[]; box.querySelectorAll('p').forEach(function(p){
+        var t=p.querySelector('.tag'); var tag=t?t.textContent.trim():'';
+        var body=p.textContent.trim(); if(tag) body=body.slice(tag.length).trim();
+        ps.push({tag:tag,text:body});
+      }); out.push(ps);
+    });
+    return out;
+  }
+  function conds(sec){ return Array.from(sec.querySelectorAll('.cond li')).map(function(li){return li.textContent.trim()}); }
+  var dts=secs[0].querySelectorAll('.dlg dt'), dds=secs[0].querySelectorAll('.dlg dd'), dlg=[];
+  for(var i=0;i<dts.length;i++) dlg.push({who:dts[i].textContent.trim(),text:dds[i].textContent.trim()});
+  return {dlg:dlg, cond1:conds(secs[0]), p2:paras(secs[1]), p3:paras(secs[2]), cond3:conds(secs[2])};
+}
+
 function renderSheet(rec){
-  var pages=[], ctx, y;
+  var ex=examContent();
+  var pages=[], ctx, y, box=null;
   var who=rec.grade+'학년 '+rec.cls+'반 '+rec.num+'번 '+rec.name;
+  var BODY='400 22px '+SERIF, BODY_LH=38, ANS='400 24px '+SERIF, ANS_LH=46;
   function newPage(){
     var cv=document.createElement('canvas'); cv.width=PW; cv.height=PH;
-    ctx=cv.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,PW,PH);
-    ctx.textBaseline='alphabetic';
-    pages.push(cv);
-    y=MT;
+    ctx=cv.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,PW,PH); ctx.textBaseline='alphabetic';
+    pages.push(cv); y=MT;
     if(pages.length>1){
-      ctx.font='400 20px '+SANS; ctx.fillStyle=C.muted;
-      ctx.fillText(TITLE+' 답안지 (이어서)',MX,MT-40);
+      ctx.font='400 19px '+SANS; ctx.fillStyle=C.muted;
+      ctx.fillText('4. 더불어 살아가는 힘 (2) 주장하는 글 쓰기',MX,MT-40);
       ctx.textAlign='right'; ctx.fillText(who,PW-MX,MT-40); ctx.textAlign='left';
-      hline(MT-26,1,C.rule);
-      y=MT+10;
+      ctx.fillStyle=C.rule; ctx.fillRect(MX,MT-26,CW,1);
+      y=MT+8;
     }
   }
-  function hline(yy,w,col){ctx.fillStyle=col;ctx.fillRect(MX,yy,CW,w);}
-  function need(h){ if(y+h>PH-MB) newPage(); }
-  function textBlock(txt,font,color,lh,indent,opts){
-    opts=opts||{};
-    ctx.font=font; var lines=wrapText(ctx,txt,CW-indent-(opts.padR||0));
-    if(!lines.length) lines=[''];
-    lines.forEach(function(ln){
-      need(lh);
-      if(opts.bar){ ctx.fillStyle=opts.bar; ctx.fillRect(MX+6,y,4,lh); ctx.fillStyle=C.line; ctx.fillRect(MX+indent,y+lh-1,CW-indent,1); }
-      ctx.font=font; ctx.fillStyle=color; ctx.fillText(ln,MX+indent,y+lh*0.68);
-      y+=lh;
+  function closeBoxSeg(bottom){ ctx.strokeStyle=C.ink; ctx.lineWidth=1.5; ctx.strokeRect(MX+0.5,box.top,CW-1,bottom-box.top); }
+  function need(h){
+    if(y+h<=PH-MB) return;
+    if(box) closeBoxSeg(y+10);
+    newPage();
+    if(box){ box.top=y; y+=16; }
+  }
+  function boxStart(){ need(80); box={top:y}; y+=18; }
+  function boxEnd(){ y+=12; closeBoxSeg(y); box=null; y+=22; }
+  // label: 첫 줄 앞에 붙는 말(내어쓰기), hang: 이어지는 줄 들여쓰기 폭
+  function lines(txt,o){
+    var x=o.x!=null?o.x:MX, w=o.w!=null?o.w:CW, lw=0; o.color=o.color||C.ink;
+    if(o.label){ ctx.font=o.labelFont||o.font; lw=ctx.measureText(o.label).width; }
+    if(o.hang) lw=Math.max(lw,o.hang);
+    ctx.font=o.font;
+    var ls=wrapText(ctx,txt,w-lw); if(!ls.length) ls=[''];
+    ls.forEach(function(ln,i){
+      need(o.lh);
+      if(o.answer){ ctx.fillStyle=C.pen; ctx.fillRect(x-18,y+4,4,o.lh-8); ctx.fillStyle=C.line; ctx.fillRect(x,y+o.lh-1,w,1); }
+      if(i===0 && o.label){ ctx.font=o.labelFont||o.font; ctx.fillStyle=o.labelColor||o.color; ctx.fillText(o.label,x,y+o.lh*0.7); }
+      ctx.font=o.font; ctx.fillStyle=o.color; ctx.fillText(ln,x+lw,y+o.lh*0.7);
+      y+=o.lh;
     });
   }
-  function table(cols,rows,widths,rowH){
-    var total=rowH*rows.length; need(total);
-    var x=MX, top=y;
-    ctx.fillStyle=C.fill; ctx.fillRect(MX,top,CW,rowH);
-    ctx.strokeStyle=C.ink; ctx.lineWidth=2; ctx.strokeRect(MX,top,CW,total);
-    ctx.lineWidth=1; ctx.strokeStyle=C.rule;
-    for(var r=1;r<rows.length;r++){ctx.beginPath();ctx.moveTo(MX,top+rowH*r);ctx.lineTo(MX+CW,top+rowH*r);ctx.stroke();}
-    var acc=0;
-    widths.forEach(function(w,i){
-      var cx=MX+acc*CW, cw=w*CW;
-      if(i>0){ctx.beginPath();ctx.moveTo(cx,top);ctx.lineTo(cx,top+total);ctx.stroke();}
-      rows.forEach(function(row,r){
-        var v=row[i]==null?'':String(row[i]);
-        ctx.font=(r===0?'600 21px ':'500 24px ')+SANS; ctx.fillStyle=r===0?C.muted:C.ink;
-        if(r>0 && cols[i]==='이름') ctx.font='700 25px '+SANS;
-        ctx.textAlign='center';
-        var t=v; while(ctx.measureText(t).width>cw-16 && t.length>1) t=t.slice(0,-1);
-        ctx.fillText(t,cx+cw/2,top+rowH*r+rowH*0.64);
-        ctx.textAlign='left';
+  var IN=MX+24, INW=CW-48; // 상자 안쪽
+  function passageBoxes(groups){
+    groups.forEach(function(ps){
+      boxStart();
+      ctx.font=BODY; var tagW=ctx.measureText('(가) ').width;
+      ps.forEach(function(p,i){
+        if(i>0) y+=8;
+        lines(p.text,{font:BODY,lh:BODY_LH,x:IN,w:INW,label:p.tag?p.tag+' ':'',labelFont:'700 22px '+SERIF,hang:tagW});
       });
-      acc+=w;
+      boxEnd();
     });
-    y=top+total;
   }
+  function condBox(items){
+    boxStart();
+    lines('<조 건>',{font:'700 21px '+SANS,lh:34,x:IN,w:INW,color:C.ink});
+    items.forEach(function(t){ lines(t,{font:'400 21px '+SANS,lh:34,x:IN,w:INW,label:'∙ ',color:C.ink}); });
+    boxEnd();
+  }
+  function qHead(txt){ need(90); y+=10; lines(txt,{font:'700 25px '+SANS,lh:40,color:C.ink}); y+=10; }
+  function subQ(no,txt){ need(110); y+=6; lines(txt,{font:'600 22px '+SANS,lh:36,label:no+' ',color:C.ink}); y+=8; }
+  function answer(txt){ lines(txt,{font:ANS,lh:ANS_LH,x:MX+30,w:CW-30,answer:true,color:C.pen}); y+=26; }
 
   newPage();
-  // title zone
-  ctx.font='500 21px '+SANS; ctx.fillStyle=C.muted;
-  ctx.fillText('1학년 국어 수행평가  [9국05-02]  4. 더불어 살아가는 힘 (2)',MX,y);
-  ctx.textAlign='right'; ctx.fillText('평가자  '+EVALUATOR,PW-MX,y); ctx.textAlign='left';
-  y+=18; hline(y,3,C.ink); y+=74;
-  ctx.font='700 54px '+SERIF; ctx.fillStyle=C.ink; ctx.fillText(TITLE+' 답안지',MX,y); y+=40;
-
-  table(['학년','반','번호','이름','제출 일시'],[['학년','반','번호','이름','제출 일시'],[rec.grade,rec.cls,rec.num,rec.name,fmtDate(rec.ts)]],[.13,.13,.13,.26,.35],56);
-  y+=22;
-  table(['','1-1)','1-2)','2-1)','논술형','합계'],[['문항','1 - 1)','1 - 2)','2 - 1)','논술형','합계'],['배점','2점','2점','3점','8점','15점'],['득점','','','','','']],[.16,.14,.14,.14,.2,.22],50);
-  y+=46;
-
-  function questionHead(head,pts,prompt){
-    need(140);
-    ctx.font='700 27px '+SANS; ctx.fillStyle=C.ink; ctx.fillText(head,MX,y+28);
-    var hw=ctx.measureText(head).width;
-    ctx.font='500 21px '+SANS; ctx.fillStyle=C.muted; ctx.fillText('('+pts+'점)',MX+hw+12,y+28);
-    y+=44;
-    textBlock(prompt,'400 21px '+SANS,C.muted,34,0);
-    y+=10;
-  }
-  QUESTIONS.forEach(function(q){
-    questionHead(q.head,q.pts,q.prompt);
-    textBlock(rec.answers[q.key],'400 25px '+SERIF,C.pen,48,26,{bar:C.pen});
-    y+=40;
+  // 머리글: 원래 문제지처럼 단원명 + 학년/반/번호/이름
+  ctx.font='700 30px '+SERIF; ctx.fillStyle=C.ink;
+  ctx.fillText('4. 더불어 살아가는 힘 (2) 주장하는 글 쓰기',MX,y+10);
+  y+=62;
+  var idParts=[[rec.grade,'학년 ('],[' '+rec.cls+' ',')반 ('],[' '+rec.num+' ',')번 이름('],[' '+rec.name+' ',')']];
+  ctx.font='500 24px '+SANS; var tw=0;
+  idParts.forEach(function(p){ tw+=ctx.measureText(String(p[0])).width+ctx.measureText(p[1]).width; });
+  var xx=PW-MX-tw;
+  idParts.forEach(function(p){
+    ctx.font='700 24px '+SANS; ctx.fillStyle=C.pen; ctx.fillText(String(p[0]),xx,y); xx+=ctx.measureText(String(p[0])).width;
+    ctx.font='500 24px '+SANS; ctx.fillStyle=C.ink; ctx.fillText(p[1],xx,y); xx+=ctx.measureText(p[1]).width;
   });
-  questionHead(ESSAY.head,ESSAY.pts,ESSAY.prompt);
+  ctx.font='400 18px '+SANS; ctx.fillStyle=C.muted; ctx.fillText('제출 일시  '+fmtDate(rec.ts),MX,y);
+  y+=18; ctx.fillStyle=C.ink; ctx.fillRect(MX,y,CW,3); y+=30;
+
+  // 평가 문항 1
+  qHead('<평가 문항 1> 아래 대화를 바탕으로 물음에 답하시오. (4점)');
+  boxStart();
+  ctx.font='700 22px '+SERIF; var whoW=ctx.measureText('학생 1: ').width;
+  ex.dlg.forEach(function(d,i){ if(i>0) y+=4; lines(d.text,{font:BODY,lh:BODY_LH,x:IN,w:INW,label:d.who+': ',labelFont:'700 22px '+SERIF,hang:whoW}); });
+  boxEnd();
+  subQ('1)','대화를 바탕으로 연설문을 작성한다고 할 때, 연설문에 포함될 학생들의 주장과 이유를 서술하시오. (2점)');
+  answer(rec.answers.q1_1);
+  subQ('2)','대화를 참고하여 학생 3이 제시한 근거가 적절하지 않은 이유를 서술하시오. (2점)');
+  condBox(ex.cond1);
+  answer(rec.answers.q1_2);
+
+  // 평가 문항 2
+  qHead('<평가 문항 2> (가)~(나)의 내용을 바탕으로 물음에 답하시오. (3점)');
+  passageBoxes(ex.p2);
+  subQ('1)','(나)를 참고하여 (가)에서 적절하지 않은 표현이 쓰인 문장을 찾아 이유와 함께 작성하고, 해당 문장을 적절한 표현으로 고쳐 쓰시오. (3점)');
+  answer(rec.answers.q2_1);
+
+  // 논술형
+  qHead('<논술형> (가)~(다)의 내용을 바탕으로 물음에 답하시오. (8점)');
+  passageBoxes(ex.p3);
+  subQ('1)','최근 전동킥보드가 여러 인명 피해를 유발하면서, 전동킥보드 이용을 제한해야 한다는 주장이 제기되고 있다. ‘전동킥보드 이용 가능 연령을 만 16세에서 만 18세 이상으로 변경해야 한다.’는 주장에 대해, 자신의 생각을 (가)~(다)를 활용하여 논술하시오.');
+  condBox(ex.cond3);
   ESSAY.parts.forEach(function(p){
     need(100);
-    ctx.font='700 25px '+SERIF; ctx.fillStyle=C.ink; ctx.fillText(p.label,MX+26,y+30); y+=46;
-    textBlock(rec.answers[p.key],'400 25px '+SERIF,C.pen,48,26,{bar:C.pen});
-    y+=22;
+    lines(p.label,{font:'700 24px '+SERIF,lh:42,x:MX+30,color:C.ink});
+    answer(rec.answers[p.key]);
   });
-  y+=30; need(80);
-  hline(y,1,C.rule); y+=50;
-  ctx.font='500 23px '+SANS; ctx.fillStyle=C.ink; ctx.textAlign='right';
-  ctx.fillText('평가자  '+EVALUATOR+'     (서명)',PW-MX,y); ctx.textAlign='left';
 
-  // page numbers
   pages.forEach(function(cv,i){
     var c=cv.getContext('2d'); c.font='400 19px '+SANS; c.fillStyle=C.muted; c.textAlign='center';
     c.fillText((i+1)+' / '+pages.length,PW/2,PH-60);
